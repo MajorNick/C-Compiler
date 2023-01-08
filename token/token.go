@@ -31,8 +31,7 @@ const (
   RBRACE = "}"
 
   //statements
-  FUNCTION = "FUNCTION"
-  LET = "LET"
+  
   TRUE = "TRUE"
   FALSE = "FALSE"
   IF = "IF"
