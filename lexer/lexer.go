@@ -52,6 +52,8 @@ func (l *Lexer)NextToken() token.Token{
     tok = newToken(token.RPAREN,l.ch)
   case ',':
     tok = newToken(token.COMMA,l.ch)
+  case '&':
+    tok = newToken(token.AMPERSAND,l.ch)
   case ';':
     tok = newToken(token.SEMICOLON,l.ch)
   case '+':
@@ -107,7 +109,7 @@ func (l *Lexer)NextToken() token.Token{
    
     if isLetter(l.ch){
       tok.Literal = l.readIdentifier()
-      tok.Type = token.IDENT
+      tok.Type = token.LookForIdent(tok.Literal)
       return  tok
     }else{
     if isDigit(l.ch){

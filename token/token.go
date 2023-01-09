@@ -17,6 +17,7 @@ const (
   PLUS  =  "+"
   MINUS =  "-"
   ASTERISK = "*"
+  AMPERSAND = "&"
   SLASH = "/"
   BANG = "!"
   LEFT = "<"
@@ -49,6 +50,7 @@ const (
   WHILE = "WHILE"
   FORLOOP = "FOR"
   STRUCT = "STRUCT"
+  MAIN = "MAIN"
 
 )
 var keywords = map[string]TokenType{
@@ -60,5 +62,12 @@ var keywords = map[string]TokenType{
   "int": INT,
   "long": LONG,
   "short": SHORT,
+  "return": RETURN,
+  "main": MAIN,
 }
-//func LookForIdent
+func LookForIdent(s string)TokenType{
+  if tok, ok := keywords[s]; ok{
+    return tok
+  }
+  return IDENT
+}
