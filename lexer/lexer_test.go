@@ -27,17 +27,21 @@ func TestNextToken (t *testing.T){
   }
 }
  func TestComments (t *testing.T){
-  source := "nika\n// nika \n"
+  source := "nika\n// nika \n nika 1  /* nikaaaaaaa */  fassfs"
   
     
   tests := []struct {
     expected token.TokenType
     expectedLit string
   }{
-  {token.IDENT,"nika"},
- // {token.ENDLN,"\n"},
-  {token.COMMENT,"\n"},
-  {token.EOF,""},
+    {token.IDENT,"nika"},
+    // {token.ENDLN,"\n"},
+     {token.COMMENT,"\n"},
+     {token.IDENT,"nika"},
+     {token.INT,"1"},
+     {token.COMMENT,"/"},
+     {token.IDENT,"fassfs"},
+     {token.EOF,""},
   }
   l := New(source)
   for _,v := range tests{

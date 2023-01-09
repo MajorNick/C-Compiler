@@ -3,7 +3,6 @@ package lexer
 import (
 	"C-Compiler/token"
 	"fmt"
-  "os"
 )
 type Lexer struct{
   source string
@@ -34,8 +33,8 @@ func newToken(tokenType token.TokenType,ch byte) token.Token{
 }
 
 func (l *Lexer)NextToken() token.Token{
+  
   l.skipSpaces()
-
   
  
   var tok token.Token
@@ -65,7 +64,7 @@ func (l *Lexer)NextToken() token.Token{
    
     l.readChar() 
     // 1 line comment
-      fmt.Fprintln(os.Stdout,l.ch) 
+     
     if l.ch == '/'{
      
       for l.ch != '\n'{
@@ -74,16 +73,23 @@ func (l *Lexer)NextToken() token.Token{
       return newToken(token.COMMENT,l.ch)
     }else{
       if l.ch == '*'{
-        for {
-          if l.ch == '*'{
+        l.readChar()
+      
+        for !(l.ch == '*' && l.source[l.readPos]== '/'){
+          l.readChar()
+          if l.source[l.pos] == 0{
+            tok.Literal = ""
+            tok.Type = token.EOF 
             l.readChar()
-            if l.ch == '/'{
-              return newToken(token.COMMENT,l.ch)
-            }
+            return tok 
           }
-
         }
+        l.readChar()
+        l.readChar()
+       
+        return newToken(token.COMMENT,'/')
       }
+      fmt.Println(l.pos)
     }
   case '>':
     tok = newToken(token.RIGHT,l.ch)
@@ -93,11 +99,12 @@ func (l *Lexer)NextToken() token.Token{
     tok = newToken(token.BANG,l.ch)
   
   case 0:
+    
     tok.Literal = ""
     tok.Type = token.EOF
     
   default:
-    
+   
     if isLetter(l.ch){
       tok.Literal = l.readIdentifier()
       tok.Type = token.IDENT
@@ -144,6 +151,7 @@ func (l *Lexer)readNumber()string{
 func (l *Lexer)skipSpaces(){
   for l.ch == '\n' || l.ch == '\t' || l.ch ==' '{
     l.readChar()
+    
   }
 
 }
