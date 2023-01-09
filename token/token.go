@@ -10,7 +10,8 @@ const (
   ILLEGAL = "ILLEGAL"
   EOF = "EOF"
   IDENT = "IDENT"
-  INT = "INT"
+  ENDLN = "ENDLN"
+  COMMENT ="COMMENT"
   // operators
   ASSIGN  = "="
   PLUS  =  "+"
@@ -22,7 +23,7 @@ const (
   RIGHT = ">"
   //
 
-  COMA = ","
+  COMMA = ","
   SEMICOLON = ";"
 
   LPAREN = "("
@@ -31,10 +32,33 @@ const (
   RBRACE = "}"
 
   //statements
-  
+  VAR  = "VAR"
+  VOID = "VOID"
   TRUE = "TRUE"
   FALSE = "FALSE"
   IF = "IF"
   ELSE = "ELSE"
   RETURN = "RETURN"
+
+  LONG = "LONG"
+  SHORT = "SHORT"
+  INT = "INT"
+  CHAR = "CHAR"
+  
+
+  WHILE = "WHILE"
+  FORLOOP = "FOR"
+  STRUCT = "STRUCT"
+
 )
+var keywords = map[string]TokenType{
+  "void": VOID,
+  "for": FORLOOP,
+  "while": WHILE,
+  "struct": STRUCT,
+  "char": CHAR,
+  "int": INT,
+  "long": LONG,
+  "short": SHORT,
+}
+//func LookForIdent

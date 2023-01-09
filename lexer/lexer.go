@@ -1,7 +1,9 @@
 package lexer
 
 import (
-  "Compiler/token"
+	"C-Compiler/token"
+	"fmt"
+  "os"
 )
 type Lexer struct{
   source string
@@ -9,8 +11,8 @@ type Lexer struct{
   readPos int
   ch byte
 }
-func New(code source)*Lexer{
-   l = &Lexer{source: code}
+func New(code string)*Lexer{
+   l := &Lexer{source: code}
    l.readChar()
    return l
 }
@@ -28,12 +30,17 @@ func (l *Lexer)readChar(){
 }
 
 func newToken(tokenType token.TokenType,ch byte) token.Token{
-  return token.Token{Type: tokenType,Literal : ch}
+  return token.Token{Type: tokenType,Literal : string(ch)}
 }
 
 func (l *Lexer)NextToken() token.Token{
+  l.skipSpaces()
+
+  
+ 
   var tok token.Token
-  swith l.ch{
+  switch l.ch{
+  
   case '=':
     tok = newToken(token.ASSIGN,l.ch)
   case '{':
@@ -55,33 +62,60 @@ func (l *Lexer)NextToken() token.Token{
   case '*':
     tok = newToken(token.ASTERISK,l.ch)
   case '/':
-    tok  = newToken(token.SLASH,l.ch)
+   
+    l.readChar() 
+    // 1 line comment
+      fmt.Fprintln(os.Stdout,l.ch) 
+    if l.ch == '/'{
+     
+      for l.ch != '\n'{
+        l.readChar()
+      }
+      return newToken(token.COMMENT,l.ch)
+    }else{
+      if l.ch == '*'{
+        for {
+          if l.ch == '*'{
+            l.readChar()
+            if l.ch == '/'{
+              return newToken(token.COMMENT,l.ch)
+            }
+          }
+
+        }
+      }
+    }
   case '>':
     tok = newToken(token.RIGHT,l.ch)
   case '<':
     tok = newToken(token.LEFT,l.ch)
   case '!':
     tok = newToken(token.BANG,l.ch)
-  }
+  
   case 0:
     tok.Literal = ""
     tok.Type = token.EOF
+    
   default:
+    
     if isLetter(l.ch){
       tok.Literal = l.readIdentifier()
-      return tok
+      tok.Type = token.IDENT
+      return  tok
     }else{
     if isDigit(l.ch){
-          top.Type = token.INT
+          tok.Type = token.INT
           tok.Literal = l.readNumber()
+          return tok
         }else{
             tok = newToken(token.ILLEGAL,l.ch)
         }
     }
-
-  l.readChar
+  }
+  l.readChar()
   return tok
 }
+
 func (l *Lexer)readIdentifier()string{
   pos := l.pos
   for isLetter(l.ch){
@@ -103,7 +137,14 @@ func isDigit(b byte) bool{
 func (l *Lexer)readNumber()string{
   pos := l.pos
   for isDigit(l.ch){
-    l.readChar
+    l.readChar()
   }
   return l.source[pos:l.pos]
 }
+func (l *Lexer)skipSpaces(){
+  for l.ch == '\n' || l.ch == '\t' || l.ch ==' '{
+    l.readChar()
+  }
+
+}
+
