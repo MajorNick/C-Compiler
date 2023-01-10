@@ -45,7 +45,12 @@ const (
   SHORT = "SHORT"
   INT = "INT"
   CHAR = "CHAR"
-  
+  //Pointers
+  LONGP = "LONGP"
+  SHORTP = "SHORTP"
+  INTP = "INTP"
+  CHARP = "CHARP"
+  VOIDP = "VOIDP"
 
   WHILE = "WHILE"
   FORLOOP = "FOR"
@@ -70,4 +75,18 @@ func LookForIdent(s string)TokenType{
     return tok
   }
   return IDENT
+}
+var dataTypes = map[TokenType]TokenType{
+  CHAR: CHARP,
+  INT: INTP,
+  LONG: LONGP,
+  SHORT: SHORTP,
+  VOID: VOIDP,
+}
+
+func LookForDataTypers(t TokenType) (TokenType, bool){
+  if tok, ok := dataTypes[t]; ok{
+    return tok,true
+  }
+  return t,false
 }

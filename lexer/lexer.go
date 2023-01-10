@@ -91,7 +91,7 @@ func (l *Lexer)NextToken() token.Token{
        
         return newToken(token.COMMENT,'/')
       }
-      fmt.Println(l.pos)
+     
     }
   case '>':
     tok = newToken(token.RIGHT,l.ch)
@@ -110,6 +110,19 @@ func (l *Lexer)NextToken() token.Token{
     if isLetter(l.ch){
       tok.Literal = l.readIdentifier()
       tok.Type = token.LookForIdent(tok.Literal)
+
+      //check if data type is Pointer
+      fmt.Println(tok.Literal,l.ch)
+      if tok.Type != token.IDENT && l.ch == '*'{
+        
+        
+        tmp,ok := token.LookForDataTypers(tok.Type)
+        if ok{
+          l.readChar()
+          tok.Type = tmp
+          tok.Literal+= "*"
+        }
+      }
       return  tok
     }else{
     if isDigit(l.ch){
@@ -156,5 +169,12 @@ func (l *Lexer)skipSpaces(){
     
   }
 
+}
+func (l * Lexer)peekChar()byte{
+  if l.readPos>= len(l.source){
+    return 0
+  }else{
+   return  l.source[l.readPos]
+  }
 }
 

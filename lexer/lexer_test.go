@@ -52,8 +52,9 @@ func TestNextToken (t *testing.T){
   }
 }
 func TestHalfCode (t *testing.T){
+
   source :=  `    
-  int *a;
+  int* a;
   int b = 10;
   a = &b;
   return a;`
@@ -63,8 +64,7 @@ func TestHalfCode (t *testing.T){
     expected token.TokenType
     expectedLit string
   }{
-    {token.INT,"int"},
-    {token.ASTERISK,"*"},
+    {token.INTP,"int*"},
     {token.IDENT,"a"},
     {token.SEMICOLON,";"},
     {token.INT,"int"},
@@ -82,10 +82,10 @@ func TestHalfCode (t *testing.T){
     {token.SEMICOLON,";"},
   }
   l := New(source)
-  for _,v := range tests{
+  for i,v := range tests{
     tok := l.NextToken()
     if (tok.Type != v.expected) || (tok.Literal != v.expectedLit){
-      t.Fatalf("WRONG!!! expected: %v, got: %v", v,tok)
+      t.Fatalf("WRONG!!! expected: %v, got: %v, on %d th test", v,tok,i)
     }
   }
 }
@@ -93,7 +93,7 @@ func TestFunc (t *testing.T){
   source :=  `    
   int main() {
     // Write C code here
-    int *a;
+    int* a;
     int b = 10;
     a = &b;
     return a;
@@ -110,8 +110,7 @@ func TestFunc (t *testing.T){
     {token.RPAREN,")"},
     {token.LBRACE,"{"},
     {token.COMMENT,"\n"},
-    {token.INT,"int"},
-    {token.ASTERISK,"*"},
+    {token.INTP,"int*"},
     {token.IDENT,"a"},
     {token.SEMICOLON,";"},
     {token.INT,"int"},
