@@ -4,7 +4,7 @@ import (
 )
 
 type Node interface{
-	tokenLiteral()string
+	TokenLiteral()string
 }
 
 type Expression interface{
@@ -20,13 +20,21 @@ type Program struct{
 	Stats []Statement
 }
 type Identifier struct{
-	Token token.Token // always IDENT
+	Token token.Token 
 	Value string
 }
 type DeclStatement struct{
 	Token token.Token 
 	Name *Identifier
 	Value Expression
+}
+type ReturnStatement struct{
+	Token token.Token
+	ReturnValue Expression
+}
+func (rs * ReturnStatement)statementNode(){}
+func (rs * ReturnStatement)TokenLiteral()string{
+	return rs.Token.Literal
 }
 
 func (dc * DeclStatement)TokenLiteral() string{
@@ -43,9 +51,9 @@ func (id * Identifier)TokenLiteral()string{
 }
 
 
-func (p *Program)tokenLiteral()string{
+func (p *Program)TokenLiteral()string{
 	if len(p.Stats)>0{
-		return p.Stats[0].tokenLiteral()
+		return p.Stats[0].TokenLiteral()
 	}else{
 		return ""
 	}

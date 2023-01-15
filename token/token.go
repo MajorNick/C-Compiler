@@ -90,3 +90,4 @@ func LookForDataTypers(t TokenType) (TokenType, bool){
   }
   return t,false
 }
+
