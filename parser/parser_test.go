@@ -111,3 +111,53 @@ func TestParseReturn(t *testing.T){
 		} 
 	}	
 }
+
+func TestIdentifierExpression(t *testing.T){
+	source := "variable;"
+	l := lexer.New(source)
+	p := New(l)
+	program := p.ParseProgram()
+
+	checkParserError(t,p)
+
+	if len(program.Stats) != 1{
+		t.Fatalf("expected 1 Statement, But Got %d", len(program.Stats))
+	}
+	stmt, ok := program.Stats[0].(*ast.ExpressionStatement)
+	if !ok{
+		t.Fatalf("Program.Stats[0] isn't Expression Statement Type!")
+	}
+	ident, ok := stmt.Expression.(*ast.Identifier)
+	if !ok{
+		t.Fatalf("Is n't Identifier Type!")
+	}
+	if ident.Value != "variable"{
+		t.Fatalf("expected Token Literal: varibale, but got %s",ident.Value)
+	}
+	if ident.TokenLiteral() != "variable"{
+		t.Fatalf("expected Token Literal: varibale, but got %s",ident.TokenLiteral())
+	}
+}
+
+func TestNumberLiteral(t *testing.T){
+	
+}
+
+
+
+
+
+
+//check errors
+func checkParserError(t *testing.T, p * Parser){
+	errors := p.Errors()
+	if len(errors) == 0{
+		return
+	}else{	
+		for i,v := range errors{
+			t.Errorf("%d) %q",i,v)
+		}
+		
+		t.FailNow()
+	}
+}
