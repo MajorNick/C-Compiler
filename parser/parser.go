@@ -5,6 +5,7 @@ import (
 	"C-Compiler/lexer"
 	"C-Compiler/token"
 	"fmt"
+	"strconv"
 )
 const (
 	_ int = iota
@@ -31,6 +32,7 @@ type Parser struct{
 
 	prefixParserFns map[token.TokenType]prefixParserFn
 	infixParserFns map[token.TokenType]infixParserFn
+	
 }
 
 
@@ -42,6 +44,7 @@ func New(l *lexer.Lexer)*Parser{
 	p.nextToken()
 	p.nextToken()
 	p.prefixParserFns= make(map[token.TokenType]prefixParserFn)
+	p.addPrefixFn(token.INT, p.parseIntegerLiteral)
 	p.addPrefixFn(token.IDENT,p.parseIdentifier)
 	p.errors= []string{}
 	return &p
@@ -80,10 +83,10 @@ func (p* Parser)ParseProgram() *ast.Program{
 
 func (p *Parser)parseStatement() ast.Statement{
 	switch p.curTok.Type{
-	case token.INT,token.LONG,token.SHORT,token.CHAR:
-		return p.parseDecStatement()
-	case token.INTP,token.LONGP,token.SHORTP,token.CHARP,token.VOIDP:
-		return p.parseDecStatement()
+//	case token.INT,token.LONG,token.SHORT,token.CHAR:
+//		return p.parseDecStatement()
+//	case token.INTP,token.LONGP,token.SHORTP,token.CHARP,token.VOIDP:
+//		return p.parseDecStatement()
 	case token.RETURN:
 		return p.parseReturnStatement()
 	case token.WHILE:
@@ -92,6 +95,7 @@ func (p *Parser)parseStatement() ast.Statement{
 		return p.parseIfStatement()
 
 	default:
+		
 		return p.parseExpressionStatement()
 	}
 		
@@ -129,11 +133,14 @@ func (p *Parser)parseDecStatement() *ast.DeclStatement{
 }
 
 func (p *Parser) parseReturnStatement() *ast.ReturnStatement{
+	
 	stmt := &ast.ReturnStatement{Token:p.curTok}
-	p.nextToken()
+	
+	//p.nextToken()
 	// currently not parsing expression
-
-	for !p.curTokenIs(token.SEMICOLON){
+	
+	for p.nextTokenIs(token.SEMICOLON){
+		
 		p.nextToken()
 	} 
 	return stmt
@@ -154,7 +161,7 @@ func (p * Parser) parseIfStatement() *ast.IfStatement{
 	return stmt
 }
 
-func (p * Parser)parseExpressionStatement() *ast.ExpressionStatement{
+func (p * Parser) parseExpressionStatement() *ast.ExpressionStatement{
 	stmt := &ast.ExpressionStatement{Token: p.curTok}
 
 	stmt.Expression = p.parseExpression(LOWEST)
@@ -178,6 +185,18 @@ func (p * Parser)parseIdentifier() ast.Expression{
 	return &ast.Identifier{Token: p.curTok,Value: p.curTok.Literal}
 }
 
+func (p *Parser)parseIntegerLiteral() ast.Expression{
+	lit := &ast.IntegerLiteral{Token: p.curTok}
+	value, err := strconv.ParseInt(p.curTok.Literal,0,64)
+
+	if err != nil{
+		er := fmt.Sprintf("Couldn't Parse %q to Integer",p.curTok.Literal)
+		p.errors = append(p.errors, er)
+	}
+	lit.Value = value
+	return lit
+}
+ 
 
 // helper function
 

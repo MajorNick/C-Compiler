@@ -88,6 +88,7 @@ func (ifs * IfStatement)TokenLiteral()string{
 }
 
 
+//expressions 
 
 type ExpressionStatement struct{
 	Token token.Token
@@ -96,4 +97,13 @@ type ExpressionStatement struct{
 func (exp * ExpressionStatement)statementNode(){}
 func (exp * ExpressionStatement)TokenLiteral()string{
 	return exp.Token.Literal
+}
+
+type IntegerLiteral struct{
+	Token token.Token
+	Value int64
+}
+func (il * IntegerLiteral)expressionNode(){}
+func (il * IntegerLiteral)TokenLiteral()string{
+	return il.Token.Literal
 }
