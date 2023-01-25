@@ -41,7 +41,12 @@ func (l *Lexer)NextToken() token.Token{
   switch l.ch{
   
   case '=':
-    tok = newToken(token.ASSIGN,l.ch)
+    if l.peekChar() == '='{
+      l.readChar()
+      tok = token.Token{Type: token.EQ,Literal: "=="}         // If token is == returning Token EQ, with literal "==" 
+    }  else{
+      tok = newToken(token.ASSIGN,l.ch)
+    }
   case '{':
     tok = newToken(token.LBRACE,l.ch)
   case '}':
@@ -64,42 +69,30 @@ func (l *Lexer)NextToken() token.Token{
     tok = newToken(token.ASTERISK,l.ch)
   case '/':
    
-    l.readChar() 
-    // 1 line comment
-     
-    if l.ch == '/'{
-     
-      for l.ch != '\n'{
-        l.readChar()
-      }
-      return newToken(token.COMMENT,l.ch)
-    }else{
-      if l.ch == '*'{
-        l.readChar()
-      
-        for !(l.ch == '*' && l.source[l.readPos]== '/'){
-          l.readChar()
-          if l.source[l.pos] == 0{
-            tok.Literal = ""
-            tok.Type = token.EOF 
-            l.readChar()
-            return tok 
-          }
-        }
-        l.readChar()
-        l.readChar()
-       
-        return newToken(token.COMMENT,'/')
-      }
-     
-    }
-  case '>':
-    tok = newToken(token.RIGHT,l.ch)
-  case '<':
-    tok = newToken(token.LEFT,l.ch)
-  case '!':
-    tok = newToken(token.BANG,l.ch)
+    tok =  newToken(token.SLASH,'/')
   
+  case '>':
+    if l.peekChar() == '='{
+      l.readChar()
+      tok = token.Token{Type: token.GTE,Literal: ">="}
+    }else{
+      tok = newToken(token.RIGHT,l.ch)
+    }
+    
+  case '<':
+    if l.peekChar() == '='{
+      l.readChar()
+      tok = token.Token{Type: token.LTE,Literal: "<="}
+    }else{
+       tok = newToken(token.LEFT,l.ch)
+    }
+  case '!':
+    if l.peekChar() == '='{
+      l.readChar()
+      tok = token.Token{Type: token.NOT_EQ,Literal: "!="}
+    }else{
+    tok = newToken(token.BANG,l.ch)
+    }
   case 0:
     
     tok.Literal = ""

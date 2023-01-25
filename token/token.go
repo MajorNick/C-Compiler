@@ -22,6 +22,12 @@ const (
   BANG = "!"
   LEFT = "<"
   RIGHT = ">"
+  EQ = "=="
+  NOT_EQ = "!="
+  PERCENT = "%"
+  GTE = ">="
+  LTE = "<="
+
   //
 
   COMMA = ","

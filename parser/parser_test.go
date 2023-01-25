@@ -214,7 +214,84 @@ func testIntegerLiteral(t *testing.T,exp ast.Expression,value int64)bool{
 }
 
 
+func TestParseInfixExpressions(t *testing.T){
+	Tests := []struct{
+		source string
+		left int64
+		operator string
+		right int64
+	}{
+		{"2+2",2,"+",2},
+		{"2 * 2",2,"*",2},
+		{"2 /2",2,"/",2},
+		{"2 == 2",2,"==",2},
+		{"2 >= 2",2,">=",2},
+		{"2 <= 2",2,"<=",2},
 
+	}
+
+	for _,test := range Tests{
+		l :=  lexer.New(test.source)
+		p := New(l)
+		program := p.ParseProgram()
+		
+		checkParserError(t,p)
+		if len(program.Stats) != 1{
+			t.Fatalf("expected 1 Expression, But Got %d", len(program.Stats))
+		}
+		stmt, ok := program.Stats[0].(*ast.ExpressionStatement)
+		if !ok{
+			t.Fatalf("Program.Stats[0] isn't Expression Statement Type!")
+		}
+		exp, ok := stmt.Expression.(*ast.InfixExpression)
+
+		if !ok{
+			t.Fatalf("exp is not ast.InfixExpression. got=%T", stmt.Expression)
+		}
+		if !testIntegerLiteral(t,exp.Left,test.left){
+			return 
+		}
+		if exp.Operator != test.operator{
+			t.Fatalf("exp.Operator is not '%s'. got=%s",test.operator, exp.Operator)
+		}
+		if !testIntegerLiteral(t,exp.Right,test.right){
+			return 
+		}
+	}
+}
+
+
+func TestOperatorPrecendence(t *testing.T){
+	Tests := []struct{
+		source string
+		expected string
+	}{
+		{
+			"-a*b",
+			"((-a)*b)",
+		},
+		{
+			"!-a",
+			"!(-a)",
+		},{
+			"a+b/c",
+			"(a+(b/c))",
+		},{
+			"a + b * c + d / e - f",
+			"(((a + (b * c)) + (d / e)) - f)",
+		},
+	}
+
+	for _,test := range Tests{
+		l := lexer.New(test.source)
+		p := New(l)
+		program := p.ParseProgram()
+		checkParserError(t,p)
+		if test.expected != program.String(){
+			
+		}
+	}
+}
 
 
 
