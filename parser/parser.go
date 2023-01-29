@@ -21,6 +21,8 @@ const (
 var precendences = map[token.TokenType]int{
 	token.EQ : EQUALS,
 	token.NOT_EQ : EQUALS,
+	token.LEFT:LESSGREATER,
+	token.RIGHT:LESSGREATER,
 	token.LTE: LESSGREATER,
 	token.GTE: LESSGREATER,
 	token.PLUS: SUM,
@@ -76,6 +78,8 @@ func New(l *lexer.Lexer)*Parser{
 	p.addPrefixFn(token.IDENT,p.parseIdentifier)
 	p.addPrefixFn(token.BANG,p.parsePrefixExpression)
 	p.addPrefixFn(token.MINUS,p.parsePrefixExpression)
+	p.addPrefixFn(token.TRUE,p.parseBool)
+	p.addPrefixFn(token.FALSE,p.parseBool)
 	// infix parsers
 	p.infixParserFns= make(map[token.TokenType]infixParserFn)
 	p.addInfixFn(token.MINUS,p.parseInfixExpression)
@@ -86,6 +90,8 @@ func New(l *lexer.Lexer)*Parser{
 	p.addInfixFn(token.NOT_EQ,p.parseInfixExpression)
 	p.addInfixFn(token.ASTERISK,p.parseInfixExpression)
 	p.addInfixFn(token.SLASH,p.parseInfixExpression)
+	p.addInfixFn(token.LEFT,p.parseInfixExpression)
+	p.addInfixFn(token.RIGHT,p.parseInfixExpression)
 	return &p
 }
 func (p * Parser)nextToken(){
@@ -202,10 +208,12 @@ func (p *Parser) parseReturnStatement() *ast.ReturnStatement{
 func (p * Parser) parseIfStatement() *ast.IfStatement{
 	stmt := &ast.IfStatement{Token:p.curTok}
 	if !p.exceptNext(token.LBRACE){
-		// error in syntax
+		
+		
 		p.nextError(token.LBRACE)
 	}
 	// parse expressions
+	p.nextToken()
 	
 	return stmt
 }
@@ -268,6 +276,10 @@ func (p * Parser) parsePrefixExpression()ast.Expression{
 	p.nextToken()
 	expression.Right = p.parseExpression(PREFIX)
 	return expression
+}
+
+func (p * Parser) parseBool()ast.Expression{
+	return &ast.Boolean{Token:p.curTok, Value: p.curTokenIs(token.TRUE)}
 }
 
 // infix Parser 

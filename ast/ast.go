@@ -77,7 +77,7 @@ func (id * Identifier)TokenLiteral()string{
 	return id.Token.Literal
 }
 func (id * Identifier)String()string{
-	return "test"
+	return "test1"
 }
 
 
@@ -120,7 +120,10 @@ func (exp * ExpressionStatement)TokenLiteral()string{
 	return exp.Token.Literal
 }
 func (exp * ExpressionStatement)String()string{
-	return "test"
+	if exp!= nil{
+		return exp.Expression.String()
+	}
+	return ""
 }
 
 type IntegerLiteral struct{
@@ -132,7 +135,7 @@ func (il * IntegerLiteral)TokenLiteral()string{
 	return il.Token.Literal
 }
 func (il * IntegerLiteral)String()string{
-	return "test"
+	return il.TokenLiteral()
 }
 
 type PrefixExpression struct{
@@ -167,4 +170,17 @@ func (oe *InfixExpression )String()string{
 	out.WriteString(oe.Right.String())
 	out.WriteString(")")
 	return out.String()
+}
+
+type Boolean struct{
+	Token token.Token
+	Value bool
+}
+
+func (b *Boolean) expressionNode(){}
+func (b *Boolean) TokenLiteral()string{
+	return b.Token.Literal
+}
+func (b *Boolean) String()string{
+	return b.Token.Literal
 }

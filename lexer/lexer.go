@@ -2,7 +2,7 @@ package lexer
 
 import (
 	"C-Compiler/token"
-
+	"fmt"
 )
 type Lexer struct{
   source string
@@ -105,7 +105,7 @@ func (l *Lexer)NextToken() token.Token{
       tok.Type = token.LookForIdent(tok.Literal)
 
       //check if data type is Pointer
-
+      
       if tok.Type != token.IDENT && l.ch == '*'{
         
         
@@ -123,6 +123,7 @@ func (l *Lexer)NextToken() token.Token{
           tok.Literal = l.readNumber()
           return tok
         }else{
+          fmt.Printf("%c",l.ch)
             tok = newToken(token.ILLEGAL,l.ch)
         }
     }
