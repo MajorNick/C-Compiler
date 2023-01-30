@@ -80,6 +80,7 @@ func New(l *lexer.Lexer)*Parser{
 	p.addPrefixFn(token.MINUS,p.parsePrefixExpression)
 	p.addPrefixFn(token.TRUE,p.parseBool)
 	p.addPrefixFn(token.FALSE,p.parseBool)
+	p.addPrefixFn(token.IF,p.parseIf) 
 	// infix parsers
 	p.infixParserFns= make(map[token.TokenType]infixParserFn)
 	p.addInfixFn(token.MINUS,p.parseInfixExpression)
@@ -146,8 +147,6 @@ func (p *Parser)parseStatement() ast.Statement{
 		return p.parseReturnStatement()
 	case token.WHILE:
 
-	case token.IF:
-		return p.parseIfStatement()
 
 	default:
 		
@@ -205,18 +204,6 @@ func (p *Parser) parseReturnStatement() *ast.ReturnStatement{
 
 
 
-func (p * Parser) parseIfStatement() *ast.IfStatement{
-	stmt := &ast.IfStatement{Token:p.curTok}
-	if !p.exceptNext(token.LBRACE){
-		
-		
-		p.nextError(token.LBRACE)
-	}
-	// parse expressions
-	p.nextToken()
-	
-	return stmt
-}
 
 func (p * Parser) parseExpressionStatement() *ast.ExpressionStatement{
 	
@@ -240,6 +227,7 @@ func (p * Parser)parseExpression(precendence int) ast.Expression{
 	}
 		leftExpression := prefix()
 	for !p.nextTokenIs(token.SEMICOLON) && precendence < p.nextPrecendence(){
+		
 		infix := p.infixParserFns[p.nextTok.Type]
 		if infix == nil{
 			return leftExpression
@@ -293,9 +281,51 @@ func (p* Parser) parseInfixExpression(left ast.Expression)ast.Expression{
 	
 	p.nextToken()
 	expression.Right = p.parseExpression(precendence)
-	fmt.Println(expression.Left,expression.Right,expression.Operator)
+	
 
 	return expression
+}
+
+func (p *Parser) parseIf() ast.Expression{
+	exp := &ast.IfExpression{Token: p.curTok}
+	
+	if !p.exceptNext(token.LPAREN){
+		return nil
+	}
+	p.nextToken()
+	exp.Condition = p.parseExpression(LOWEST)
+	if !p.exceptNext(token.RPAREN){
+		return nil
+	}
+	if !p.exceptNext(token.LBRACE){
+		return nil
+	}
+	exp.Consequence = p.parseBlockSegment()
+	
+	if p.nextTokenIs(token.ELSE){
+		p.nextToken()
+		if !p.exceptNext(token.LBRACE){
+			
+			return nil
+		}
+		
+		exp.Alternative = p.parseBlockSegment()
+	}
+	
+	return exp
+}
+func (p * Parser) parseBlockSegment()*ast.BlockStatement{
+	block := &ast.BlockStatement{Token: p.curTok}
+	block.Statements = []ast.Statement{}
+	p.nextToken()
+	for !p.curTokenIs(token.RBRACE) &&!p.curTokenIs(token.EOF){
+		stmt := p.parseStatement()
+		if stmt!= nil{
+			block.Statements = append(block.Statements,stmt)
+		}
+		p.nextToken()
+	}
+	return block
 }
  
 

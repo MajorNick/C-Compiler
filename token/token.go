@@ -77,6 +77,8 @@ var keywords = map[string]TokenType{
   "main": MAIN,
   "false": FALSE,
   "true": TRUE,
+  "if":IF,
+  "else":ELSE,
 }
 func LookForIdent(s string)TokenType{
   if tok, ok := keywords[s]; ok{
