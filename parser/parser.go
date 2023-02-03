@@ -5,6 +5,8 @@ import (
 	"C-Compiler/lexer"
 	"C-Compiler/token"
 	"fmt"
+	
+	_ "log"
 	"strconv"
 )
 const (
@@ -139,8 +141,8 @@ func (p* Parser)ParseProgram() *ast.Program{
 func (p *Parser)parseStatement() ast.Statement{
 	
 	switch p.curTok.Type{
-//	case token.INT,token.LONG,token.SHORT,token.CHAR:
-//		return p.parseDecStatement()
+	case token.INT,token.LONG,token.SHORT,token.CHAR:
+		return p.parseDecStatement()
 //	case token.INTP,token.LONGP,token.SHORTP,token.CHARP,token.VOIDP:
 //		return p.parseDecStatement()
 	case token.RETURN:
@@ -159,27 +161,39 @@ func (p *Parser)parseStatement() ast.Statement{
 
 func (p *Parser)parseDecStatement() *ast.DeclStatement{
 	stmt := &ast.DeclStatement{Token: p.curTok}
+
 	if !p.exceptNext(token.IDENT){
+		err := fmt.Sprintf("Wrong Token. Expected: %s, got: %s",token.IDENT,p.curTok)
+		p.errors = append(p.errors, err)
 		return nil
 	}
+	
+	if p.nextTokenIs(token.LBRACE){
+		// argumentebi
+	} else{
+		
+		for !p.curTokenIs(token.SEMICOLON) {
+			variable := &ast.Variable{Ident: p.curTok.Literal,Type:stmt.Token}
 
-	stmt.Name = &ast.Identifier{Token: p.curTok,Value: p.curTok.Literal}
-	// currently not parsing expressions
-	p.nextToken()
-	for !p.curTokenIs(token.SEMICOLON){
-		if p.curTokenIs(token.IDENT){
-			if p.nextTokenIs(token.ASSIGN){
-				//p.nextToken()
-				p.variableDeclarationAssign()
+			if p.exceptNext(token.ASSIGN){
+				// can't parse Expressiong
+				//variable.Value = p.parseExpression(LOWEST)
+				p.nextToken()
+				exp := p.parseExpressionStatement()
+				p.nextToken()
+				variable.Value = exp
+
 			}else{
-				if p.nextTokenIs(token.COMMA){
-					//p.nextToken()
-				p.variableDeclaration()
-				}
+				p.nextToken()
 			}
+			stmt.Vars = append(stmt.Vars,variable)
+			if p.curTokenIs(token.COMMA){
+				p.nextToken()
+			}
+
+			
 		}
 		p.nextToken()
-		
 	}
 	
 

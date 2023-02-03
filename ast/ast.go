@@ -34,11 +34,15 @@ type Identifier struct{
 }
 
 // statemet structs
-
+type Variable struct{
+	Type token.Token
+	Ident string
+	Value Statement
+}
 type DeclStatement struct{
 	Token token.Token 
-	Name *Identifier
-	Value Expression
+	Vars []*Variable
+	
 }
 
 // return 
