@@ -1,7 +1,9 @@
 package ast
+
 import (
 	"C-Compiler/token"
 	"bytes"
+	"strings"
 )
 
 type Node interface{
@@ -29,11 +31,36 @@ func (p *Program) String() string {
 	return out.String()
 	}
 type Identifier struct{
+	
 	Token token.Token 
 	Value string
 }
 
-// statemet structs
+
+type FunctionLiteral struct{
+	Token token.Token // return type of fn
+	Arguments []*Identifier
+	Body * BlockStatement
+}
+func (fl * FunctionLiteral)StatementNode(){}
+func (fl * FunctionLiteral)TokenLiteral()string{
+	return fl.Token.Literal
+}
+func (fl * FunctionLiteral)String()string{
+	var out bytes.Buffer
+	args := []string{}
+	for _,v := range  fl.Arguments{
+		args = append(args, v.String())
+	}
+	out.WriteString(fl.TokenLiteral())
+	out.WriteString("(")
+	out.WriteString(strings.Join(args,", "))
+	out.WriteString(")")
+	out.WriteString(fl.Body.String())
+	return out.String() 
+}
+
+
 type Variable struct{
 	Type token.Token
 	Ident string
@@ -41,9 +68,22 @@ type Variable struct{
 }
 type DeclStatement struct{
 	Token token.Token 
-	Vars []*Variable
+	Statement Statement
 	
 }
+
+type VariableDecStatement struct{
+	Token token.Token 
+	Vars []*Variable
+}
+func (vds * VariableDecStatement)statementNode(){}
+func (vds * VariableDecStatement)TokenLiteral()string{
+	return vds.Token.Literal
+}
+func (vds * VariableDecStatement)String()string{
+	return "test"
+}
+
 
 // return 
 type ReturnStatement struct{
@@ -81,7 +121,7 @@ func (id * Identifier)TokenLiteral()string{
 	return id.Token.Literal
 }
 func (id * Identifier)String()string{
-	return "test1"
+	return id.Value
 }
 
 

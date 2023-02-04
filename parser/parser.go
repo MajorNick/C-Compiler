@@ -143,8 +143,8 @@ func (p *Parser)parseStatement() ast.Statement{
 	switch p.curTok.Type{
 	case token.INT,token.LONG,token.SHORT,token.CHAR:
 		return p.parseDecStatement()
-//	case token.INTP,token.LONGP,token.SHORTP,token.CHARP,token.VOIDP:
-//		return p.parseDecStatement()
+	case token.INTP,token.LONGP,token.SHORTP,token.CHARP,token.VOIDP:
+		return p.parseDecStatement()
 	case token.RETURN:
 		return p.parseReturnStatement()
 	case token.WHILE:
@@ -160,8 +160,8 @@ func (p *Parser)parseStatement() ast.Statement{
 
 
 func (p *Parser)parseDecStatement() *ast.DeclStatement{
-	stmt := &ast.DeclStatement{Token: p.curTok}
-
+	TypeTok := p.curTok	
+	stmt := &ast.DeclStatement{Token: TypeTok}
 	if !p.exceptNext(token.IDENT){
 		err := fmt.Sprintf("Wrong Token. Expected: %s, got: %s",token.IDENT,p.curTok)
 		p.errors = append(p.errors, err)
@@ -169,9 +169,11 @@ func (p *Parser)parseDecStatement() *ast.DeclStatement{
 	}
 	
 	if p.nextTokenIs(token.LBRACE){
-		// argumentebi
-	} else{
+		//parse fn
 		
+		
+	} else{
+		varStmt := &ast.VariableDecStatement{Token: TypeTok}
 		for !p.curTokenIs(token.SEMICOLON) {
 			variable := &ast.Variable{Ident: p.curTok.Literal,Type:stmt.Token}
 
@@ -186,7 +188,7 @@ func (p *Parser)parseDecStatement() *ast.DeclStatement{
 			}else{
 				p.nextToken()
 			}
-			stmt.Vars = append(stmt.Vars,variable)
+			varStmt.Vars = append(varStmt.Vars,variable)
 			if p.curTokenIs(token.COMMA){
 				p.nextToken()
 			}
@@ -194,6 +196,7 @@ func (p *Parser)parseDecStatement() *ast.DeclStatement{
 			
 		}
 		p.nextToken()
+		stmt.Statement = varStmt
 	}
 	
 

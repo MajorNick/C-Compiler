@@ -3,8 +3,9 @@ package parser
 import (
 	"C-Compiler/ast"
 	"C-Compiler/lexer"
-	_ "C-Compiler/token"
+	 "C-Compiler/token"
 	"fmt"
+	
 
 	"testing"
 )
@@ -500,7 +501,7 @@ func TestIfExpression(t *testing.T) {
 
 func TestDecStatement(t *testing.T) {
 	source := `
-	int a=5,b=523,c;
+	int a=5+23,b=523,c;
 	`
 	l := lexer.New(source)
 	p := New(l)
@@ -520,8 +521,8 @@ func TestDecStatement(t *testing.T) {
 	if stmt.Vars[0].Ident!= "a"{
 		t.Fatalf("on 0 index expected a but got %s",stmt.Vars[0].Value.TokenLiteral())
 	}
-	if stmt.Vars[0].Value.String() != "5"{
-		t.Fatalf("Expected value 5 but got :%s",stmt.Vars[0].Value.String())
+	if stmt.Vars[0].Value.String() != "(5 + 23)"{
+		t.Fatalf("Expected value (5 + 23) but got :%s",stmt.Vars[0].Value.String())
 	}
 	if stmt.Vars[1].Ident!= "b"{
 		t.Fatalf("on 0 index expected b but got %s",stmt.Vars[0].Value.TokenLiteral())
@@ -533,6 +534,50 @@ func TestDecStatement(t *testing.T) {
 		t.Fatalf("on 0 index expected c but got %s",stmt.Vars[0].Value.TokenLiteral())
 	}
 }
+
+func TestFunctionLiteral(t *testing.T){
+	source := `
+	int sum(int a,int b){
+		return a+b;
+	}
+	`
+	l := lexer.New(source )
+	p := New(l)
+	program := p.ParseProgram()
+	checkParserError(t,p)
+	if len(program.Stats) != 1{
+		t.Fatalf("expected  ! Statement but got %d",len(program.Stats))
+	}
+	stmt,ok := program.Stats[0].(*ast.DeclStatement)
+	if !ok {
+		t.Fatalf("program stat[0] isnt Expression Statement Got: %T",program.Stats[0])
+	}
+	fn, ok := stmt.Statement.(*ast.FunctionLiteral)
+	if !ok {
+		t.Fatalf("stmt isn't Expression Statement Got: %T",stmt)
+	}
+	if len(fn.Arguments) != 2{
+		t.Fatalf("expected 2 Arguments but Got: %d",len(fn.Arguments))
+	}
+	arg1 := fn.Arguments[0]
+	if arg1.Token.Type != token.INT{
+		t.Fatalf("First Argument's Type isn't int Got : %s",arg1.Token.Type) 
+	}
+	testLiteralExpression(t,arg1,"a")
+	arg2 := fn.Arguments[2]
+	if arg2.Token.Type != token.INT{
+		t.Fatalf("Second Argument's Type isn't int Got : %s",arg2.Token.Type) 
+	}
+	testLiteralExpression(t,arg2,"b")
+	 if len(fn.Body.Statements) != 1{
+		t.Fatalf("expected  1 Statement but got %d",len(fn.Body.Statements))
+	 }
+	 _, ok = fn.Body.Statements[0].(*ast.ExpressionStatement)
+	 if !ok{
+		t.Fatalf("Function's body isn't ast.ExpressionStatement Got:= %T",fn.Body.Statements[0])
+	 }
+	 
+	}
 
 //check errors
 func checkParserError(t *testing.T, p *Parser) {
