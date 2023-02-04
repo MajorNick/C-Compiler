@@ -3,7 +3,7 @@ package ast
 import (
 	"C-Compiler/token"
 	"bytes"
-	"strings"
+	//"strings"
 )
 
 type Node interface{
@@ -39,14 +39,15 @@ type Identifier struct{
 
 type FunctionLiteral struct{
 	Token token.Token // return type of fn
-	Arguments []*Identifier
+	Arguments []*Variable
 	Body * BlockStatement
 }
-func (fl * FunctionLiteral)StatementNode(){}
+func (fl * FunctionLiteral)statementNode(){}
 func (fl * FunctionLiteral)TokenLiteral()string{
 	return fl.Token.Literal
 }
 func (fl * FunctionLiteral)String()string{
+	/*
 	var out bytes.Buffer
 	args := []string{}
 	for _,v := range  fl.Arguments{
@@ -57,7 +58,8 @@ func (fl * FunctionLiteral)String()string{
 	out.WriteString(strings.Join(args,", "))
 	out.WriteString(")")
 	out.WriteString(fl.Body.String())
-	return out.String() 
+	*/
+	return "tmp" 
 }
 
 

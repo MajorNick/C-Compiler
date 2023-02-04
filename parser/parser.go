@@ -168,9 +168,26 @@ func (p *Parser)parseDecStatement() *ast.DeclStatement{
 		return nil
 	}
 	
-	if p.nextTokenIs(token.LBRACE){
+	if p.nextTokenIs(token.LPAREN){
 		//parse fn
+		fnStmt := &ast.FunctionLiteral{Token: TypeTok}
 		
+		p.nextToken()
+		for !p.curTokenIs(token.RPAREN){
+			variable := &ast.Variable{Type: p.curTok}
+			p.nextToken()
+			if !p.curTokenIs(token.IDENT){
+				err := fmt.Sprintf("Invalid Function arguments Got: %v",p.curTok)
+				p.errors = append(p.errors, err)
+				return nil
+			}
+			variable.Ident = p.curTok.Literal
+			fnStmt.Arguments = append(fnStmt.Arguments,variable)
+			p.exceptNext(token.COMMA)
+			p.nextToken()
+		}
+		fnStmt.Body = p.parseBlockSegment()
+		stmt.Statement = fnStmt
 		
 	} else{
 		varStmt := &ast.VariableDecStatement{Token: TypeTok}
@@ -178,8 +195,7 @@ func (p *Parser)parseDecStatement() *ast.DeclStatement{
 			variable := &ast.Variable{Ident: p.curTok.Literal,Type:stmt.Token}
 
 			if p.exceptNext(token.ASSIGN){
-				// can't parse Expressiong
-				//variable.Value = p.parseExpression(LOWEST)
+
 				p.nextToken()
 				exp := p.parseExpressionStatement()
 				p.nextToken()
@@ -375,7 +391,8 @@ func (p * Parser) exceptNext(t token.TokenType) bool{
 
 
 
-// expression parser FN helper
+
+
 
 func (p * Parser) addPrefixFn(t token.TokenType,fn prefixParserFn ){
 	p.prefixParserFns[t] = fn
