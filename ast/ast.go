@@ -90,7 +90,7 @@ func (vds * VariableDecStatement)String()string{
 // return 
 type ReturnStatement struct{
 	Token token.Token
-	ReturnValue Expression
+	ReturnValue Statement
 }
 func (rs * ReturnStatement)statementNode(){}
 func (rs * ReturnStatement)TokenLiteral()string{

@@ -3,7 +3,7 @@ package parser
 import (
 	"C-Compiler/ast"
 	"C-Compiler/lexer"
-	_"C-Compiler/token"
+	"C-Compiler/token"
 	"fmt"
 
 	"testing"
@@ -537,7 +537,7 @@ func TestDecStatement(t *testing.T) {
 		t.Fatalf("on 0 index expected c but got %s",stmt.Vars[0].Value.TokenLiteral())
 	}
 }
-/*
+
 func TestFunctionLiteral(t *testing.T){
 	source := `
 	int sum(int a,int b){
@@ -557,31 +557,41 @@ func TestFunctionLiteral(t *testing.T){
 	}
 	fn, ok := stmt.Statement.(*ast.FunctionLiteral)
 	if !ok {
-		t.Fatalf("stmt isn't Expression Statement Got: %T",stmt)
+		t.Fatalf("stmt isn't FunctionLiteral Got: %T",stmt)
 	}
 	if len(fn.Arguments) != 2{
 		t.Fatalf("expected 2 Arguments but Got: %d",len(fn.Arguments))
 	}
 	arg1 := fn.Arguments[0]
-	if arg1.Token.Type != token.INT{
-		t.Fatalf("First Argument's Type isn't int Got : %s",arg1.Token.Type) 
+
+	if arg1.Ident != "a"{
+		t.Fatalf("error in argument parsing expected: a got: %s",arg1.Ident)
 	}
-	testLiteralExpression(t,arg1,"a")
-	arg2 := fn.Arguments[2]
-	if arg2.Token.Type != token.INT{
-		t.Fatalf("Second Argument's Type isn't int Got : %s",arg2.Token.Type) 
+	if arg1.Type.Type != token.INT{
+		t.Fatalf("error in argument parsing expected: token.INT got: %v",arg1.Type)
 	}
-	testLiteralExpression(t,arg2,"b")
+	arg2 := fn.Arguments[1]
+	if arg2.Ident != "b"{
+		t.Fatalf("error in argument parsing expected: b got: %s",arg2.Ident)
+	}
+	if arg2.Type.Type != token.INT{
+		t.Fatalf("error in argument parsing expected: token.INT got: %v",arg2.Type)
+	}
+	
 	 if len(fn.Body.Statements) != 1{
 		t.Fatalf("expected  1 Statement but got %d",len(fn.Body.Statements))
 	 }
-	 _, ok = fn.Body.Statements[0].(*ast.ExpressionStatement)
+	 ret, ok := fn.Body.Statements[0].(*ast.ReturnStatement)
 	 if !ok{
 		t.Fatalf("Function's body isn't ast.ExpressionStatement Got:= %T",fn.Body.Statements[0])
 	 }
 	 
+	 if ret.ReturnValue.String() != "(a + b)"{
+		t.Fatalf("Fn's return value error. expected: (a + b). got: %s",ret.ReturnValue.String() )
+	 }
+	 
 	}
-*/
+
 //check errors
 func checkParserError(t *testing.T, p *Parser) {
 	errors := p.Errors()

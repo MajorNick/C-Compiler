@@ -173,9 +173,14 @@ func (p *Parser)parseDecStatement() *ast.DeclStatement{
 		fnStmt := &ast.FunctionLiteral{Token: TypeTok}
 		
 		p.nextToken()
+		p.nextToken()
 		for !p.curTokenIs(token.RPAREN){
+			
 			variable := &ast.Variable{Type: p.curTok}
 			p.nextToken()
+			
+			
+			
 			if !p.curTokenIs(token.IDENT){
 				err := fmt.Sprintf("Invalid Function arguments Got: %v",p.curTok)
 				p.errors = append(p.errors, err)
@@ -183,9 +188,13 @@ func (p *Parser)parseDecStatement() *ast.DeclStatement{
 			}
 			variable.Ident = p.curTok.Literal
 			fnStmt.Arguments = append(fnStmt.Arguments,variable)
-			p.exceptNext(token.COMMA)
+			if p.nextTokenIs(token.COMMA){
+				p.nextToken()
+			}
 			p.nextToken()
+			fmt.Println(p.curTok)
 		}
+		p.nextToken()
 		fnStmt.Body = p.parseBlockSegment()
 		stmt.Statement = fnStmt
 		
@@ -223,13 +232,11 @@ func (p *Parser) parseReturnStatement() *ast.ReturnStatement{
 	
 	stmt := &ast.ReturnStatement{Token:p.curTok}
 	
-	//p.nextToken()
-	// currently not parsing expression
+	p.nextToken()
+	 exp := p.parseExpressionStatement()
+	 stmt.ReturnValue = exp
 	
-	for p.nextTokenIs(token.SEMICOLON){
-		
-		p.nextToken()
-	} 
+
 	return stmt
 }
 
