@@ -2,8 +2,8 @@ package parser
 
 import (
 	"C-Compiler/ast"
-	"C-Compiler/lexer"
-	"C-Compiler/token"
+	"C-Compiler/internal/lexer"
+	"C-Compiler/internal/token"
 	"fmt"
 
 	"testing"
@@ -22,67 +22,67 @@ var dataTypes = map[string]bool{
 }
 
 /*
-func TestVarDecStatement(t *testing.T) {
-	input := `
-	int m = 0;
-	char c = 'a';
-	long l=10;
-	`
+	func TestVarDecStatement(t *testing.T) {
+		input := `
+		int m = 0;
+		char c = 'a';
+		long l=10;
+		`
 
-	l := lexer.New(input)
-	p := New(l)
+		l := lexer.New(input)
+		p := New(l)
 
-	program := p.ParseProgram()
+		program := p.ParseProgram()
 
-	if program == nil {
-		t.Fatalf("nil after ParseProrgram")
-	}
-	if len(program.Stats) != 3 {
-		t.Fatalf("Wrong number of statements after ParseProgram")
-	}
-
-	tests := []struct {
-		expectedType  string
-		expectedIdent string
-	}{
-		{"int", "m"},
-		{"char", "c"},
-		{"long", "l"},
-	}
-
-	for i := range tests {
-		state := program.Stats[i]
-		if !wrapperTestDecStat(t, state, tests[i].expectedIdent, tests[i].expectedType) {
-			return
+		if program == nil {
+			t.Fatalf("nil after ParseProrgram")
 		}
-	}
+		if len(program.Stats) != 3 {
+			t.Fatalf("Wrong number of statements after ParseProgram")
+		}
+
+		tests := []struct {
+			expectedType  string
+			expectedIdent string
+		}{
+			{"int", "m"},
+			{"char", "c"},
+			{"long", "l"},
+		}
+
+		for i := range tests {
+			state := program.Stats[i]
+			if !wrapperTestDecStat(t, state, tests[i].expectedIdent, tests[i].expectedType) {
+				return
+			}
+		}
 
 }
 
-func wrapperTestDecStat(t *testing.T, s ast.Statement, name string, tp string) bool {
-	if _, ok := dataTypes[s.TokenLiteral()]; !ok {
-		t.Errorf("Wrong  type: %v", s.TokenLiteral())
-	}
+	func wrapperTestDecStat(t *testing.T, s ast.Statement, name string, tp string) bool {
+		if _, ok := dataTypes[s.TokenLiteral()]; !ok {
+			t.Errorf("Wrong  type: %v", s.TokenLiteral())
+		}
 
-	decState, ok := s.(*ast.DeclStatement)
-	if !ok {
-		t.Errorf("s Isn't Declare Statemen!")
-		return false
+		decState, ok := s.(*ast.DeclStatement)
+		if !ok {
+			t.Errorf("s Isn't Declare Statemen!")
+			return false
+		}
+		if s.TokenLiteral() != tp {
+			t.Errorf("Wrong Type: expected %s got : %s ", tp, s.TokenLiteral())
+			return false
+		}
+		if decState.Name.Value != name {
+			t.Errorf("decState.Name.Value not '%s'. got=%s", name, decState.Name.Value)
+			return false
+		}
+		if decState.Name.TokenLiteral() != name {
+			t.Errorf("decState.Name.TokenLiteral not '%s'. got=%s", name, decState.Name.TokenLiteral())
+			return false
+		}
+		return true
 	}
-	if s.TokenLiteral() != tp {
-		t.Errorf("Wrong Type: expected %s got : %s ", tp, s.TokenLiteral())
-		return false
-	}
-	if decState.Name.Value != name {
-		t.Errorf("decState.Name.Value not '%s'. got=%s", name, decState.Name.Value)
-		return false
-	}
-	if decState.Name.TokenLiteral() != name {
-		t.Errorf("decState.Name.TokenLiteral not '%s'. got=%s", name, decState.Name.TokenLiteral())
-		return false
-	}
-	return true
-}
 */
 func TestParseReturn(t *testing.T) {
 	source := ` 
@@ -516,83 +516,83 @@ func TestDecStatement(t *testing.T) {
 	if !ok {
 		t.Fatalf("program stat[0] isnt Statement")
 	}
-	stmt,ok := st.Statement.(*ast.VariableDecStatement)
+	stmt, ok := st.Statement.(*ast.VariableDecStatement)
 
 	if !ok {
 		t.Fatalf("st isnt VariableDecStatement")
 	}
-	if stmt.Vars[0].Ident!= "a"{
-		t.Fatalf("on 0 index expected a but got %s",stmt.Vars[0].Value.TokenLiteral())
+	if stmt.Vars[0].Ident != "a" {
+		t.Fatalf("on 0 index expected a but got %s", stmt.Vars[0].Value.TokenLiteral())
 	}
-	if stmt.Vars[0].Value.String() != "(5 + 23)"{
-		t.Fatalf("Expected value (5 + 23) but got :%s",stmt.Vars[0].Value.String())
+	if stmt.Vars[0].Value.String() != "(5 + 23)" {
+		t.Fatalf("Expected value (5 + 23) but got :%s", stmt.Vars[0].Value.String())
 	}
-	if stmt.Vars[1].Ident!= "b"{
-		t.Fatalf("on 0 index expected b but got %s",stmt.Vars[0].Value.TokenLiteral())
+	if stmt.Vars[1].Ident != "b" {
+		t.Fatalf("on 0 index expected b but got %s", stmt.Vars[0].Value.TokenLiteral())
 	}
-	if stmt.Vars[1].Value.String() != "523"{
-		t.Fatalf("Expected value 523 but got :%s",stmt.Vars[0].Value.String())
+	if stmt.Vars[1].Value.String() != "523" {
+		t.Fatalf("Expected value 523 but got :%s", stmt.Vars[0].Value.String())
 	}
-	if stmt.Vars[2].Ident!= "c"{
-		t.Fatalf("on 0 index expected c but got %s",stmt.Vars[0].Value.TokenLiteral())
+	if stmt.Vars[2].Ident != "c" {
+		t.Fatalf("on 0 index expected c but got %s", stmt.Vars[0].Value.TokenLiteral())
 	}
 }
 
-func TestFunctionLiteral(t *testing.T){
+func TestFunctionLiteral(t *testing.T) {
 	source := `
 	int sum(int a,int b){
 		return a+b;
 	}
 	`
-	l := lexer.New(source )
+	l := lexer.New(source)
 	p := New(l)
 	program := p.ParseProgram()
-	checkParserError(t,p)
-	if len(program.Stats) != 1{
-		t.Fatalf("expected  ! Statement but got %d",len(program.Stats))
+	checkParserError(t, p)
+	if len(program.Stats) != 1 {
+		t.Fatalf("expected  ! Statement but got %d", len(program.Stats))
 	}
-	stmt,ok := program.Stats[0].(*ast.DeclStatement)
+	stmt, ok := program.Stats[0].(*ast.DeclStatement)
 	if !ok {
-		t.Fatalf("program stat[0] isnt Expression Statement Got: %T",program.Stats[0])
+		t.Fatalf("program stat[0] isnt Expression Statement Got: %T", program.Stats[0])
 	}
 	fn, ok := stmt.Statement.(*ast.FunctionLiteral)
 	if !ok {
-		t.Fatalf("stmt isn't FunctionLiteral Got: %T",stmt)
+		t.Fatalf("stmt isn't FunctionLiteral Got: %T", stmt)
 	}
-	if len(fn.Arguments) != 2{
-		t.Fatalf("expected 2 Arguments but Got: %d",len(fn.Arguments))
+	if len(fn.Arguments) != 2 {
+		t.Fatalf("expected 2 Arguments but Got: %d", len(fn.Arguments))
 	}
 	arg1 := fn.Arguments[0]
 
-	if arg1.Ident != "a"{
-		t.Fatalf("error in argument parsing expected: a got: %s",arg1.Ident)
+	if arg1.Ident != "a" {
+		t.Fatalf("error in argument parsing expected: a got: %s", arg1.Ident)
 	}
-	if arg1.Type.Type != token.INT{
-		t.Fatalf("error in argument parsing expected: token.INT got: %v",arg1.Type)
+	if arg1.Type.Type != token.INT {
+		t.Fatalf("error in argument parsing expected: token.INT got: %v", arg1.Type)
 	}
 	arg2 := fn.Arguments[1]
-	if arg2.Ident != "b"{
-		t.Fatalf("error in argument parsing expected: b got: %s",arg2.Ident)
+	if arg2.Ident != "b" {
+		t.Fatalf("error in argument parsing expected: b got: %s", arg2.Ident)
 	}
-	if arg2.Type.Type != token.INT{
-		t.Fatalf("error in argument parsing expected: token.INT got: %v",arg2.Type)
-	}
-	
-	 if len(fn.Body.Statements) != 1{
-		t.Fatalf("expected  1 Statement but got %d",len(fn.Body.Statements))
-	 }
-	 ret, ok := fn.Body.Statements[0].(*ast.ReturnStatement)
-	 if !ok{
-		t.Fatalf("Function's body isn't ast.ExpressionStatement Got:= %T",fn.Body.Statements[0])
-	 }
-	 
-	 if ret.ReturnValue.String() != "(a + b)"{
-		t.Fatalf("Fn's return value error. expected: (a + b). got: %s",ret.ReturnValue.String() )
-	 }
-	 
+	if arg2.Type.Type != token.INT {
+		t.Fatalf("error in argument parsing expected: token.INT got: %v", arg2.Type)
 	}
 
-//check errors
+	if len(fn.Body.Statements) != 1 {
+		t.Fatalf("expected  1 Statement but got %d", len(fn.Body.Statements))
+	}
+	ret, ok := fn.Body.Statements[0].(*ast.ReturnStatement)
+	if !ok {
+		t.Fatalf("Function's body isn't ast.ExpressionStatement Got:= %T", fn.Body.Statements[0])
+	}
+
+	if ret.ReturnValue.String() != "(a + b)" {
+		t.Fatalf("Fn's return value error. expected: (a + b). got: %s", ret.ReturnValue.String())
+	}
+
+}
+
+// check errors
 func checkParserError(t *testing.T, p *Parser) {
 	errors := p.Errors()
 	if len(errors) == 0 {
