@@ -23,7 +23,7 @@ func TestNextToken(t *testing.T) {
 	for _, v := range tests {
 		tok := l.NextToken()
 		if (tok.Type != v.expected) || (tok.Literal != v.expectedLit) {
-			t.Fatalf("WRONG!!! expected: %v, got: %v", v, tok)
+			t.Errorf("WRONG!!! expected: %v, got: %v", v, tok)
 		}
 	}
 }
@@ -35,11 +35,10 @@ func TestComments(t *testing.T) {
 		expectedLit string
 	}{
 		{token.IDENT, "nika"},
-
-		{token.COMMENT, "\n"},
+		{token.COMMENT, " nika "},
 		{token.IDENT, "nika"},
 		{token.INT, "1"},
-		{token.COMMENT, "/"},
+		{token.COMMENT, " nikaaaaaaa "},
 		{token.IDENT, "fassfs"},
 		{token.EOF, ""},
 	}
@@ -47,7 +46,7 @@ func TestComments(t *testing.T) {
 	for _, v := range tests {
 		tok := l.NextToken()
 		if (tok.Type != v.expected) || (tok.Literal != v.expectedLit) {
-			t.Fatalf("WRONG!!! expected: %v, got: %v", v, tok)
+			t.Errorf("WRONG!!! expected: %v, got: %v", v, tok)
 		}
 	}
 }
@@ -84,7 +83,7 @@ func TestHalfCode(t *testing.T) {
 	for i, v := range tests {
 		tok := l.NextToken()
 		if (tok.Type != v.expected) || (tok.Literal != v.expectedLit) {
-			t.Fatalf("WRONG!!! expected: %v, got: %v, on %d th test", v, tok, i)
+			t.Errorf("WRONG!!! expected: %v, got: %v, on %d th test", v, tok, i)
 		}
 	}
 }
@@ -130,7 +129,7 @@ func TestFunc(t *testing.T) {
 	for i, v := range tests {
 		tok := l.NextToken()
 		if (tok.Type != v.expected) || (tok.Literal != v.expectedLit) {
-			t.Fatalf("WRONG!!! expected: %v, got: %v, on %d th test", v, tok, i)
+			t.Errorf("WRONG!!! expected: %v, got: %v, on %d th test", v, tok, i)
 		}
 	}
 

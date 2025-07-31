@@ -29,8 +29,41 @@ func (l *Lexer) readChar() {
 	l.readPos++
 }
 
+func (l *Lexer) readIdentifier() string {
+	pos := l.pos
+	for isLetter(l.ch) {
+		l.readChar()
+	}
+	return l.source[pos:l.pos]
+}
+
+func (l *Lexer) readNumber() string {
+	pos := l.pos
+	for isDigit(l.ch) {
+		l.readChar()
+	}
+	return l.source[pos:l.pos]
+}
+func (l *Lexer) skipSpaces() {
+	for l.ch == '\n' || l.ch == '\t' || l.ch == ' ' {
+		l.readChar()
+
+	}
+}
+func (l *Lexer) peekChar() byte {
+	if l.readPos >= len(l.source) {
+		return 0
+	} else {
+		return l.source[l.readPos]
+	}
+}
+
 func newToken(tokenType token.TokenType, ch byte) token.Token {
 	return token.Token{Type: tokenType, Literal: string(ch)}
+}
+
+func newTokenLiteral(tokenType token.TokenType, ch string) token.Token {
+	return token.Token{Type: tokenType, Literal: ch}
 }
 
 func (l *Lexer) NextToken() token.Token {
@@ -68,8 +101,17 @@ func (l *Lexer) NextToken() token.Token {
 	case '*':
 		tok = newToken(token.ASTERISK, l.ch)
 	case '/':
-
-		tok = newToken(token.SLASH, '/')
+		if l.peekChar() == '/' {
+			l.readChar()
+			literal := l.readSingleLineComment()
+			tok = newTokenLiteral(token.COMMENT, literal)
+		} else if l.peekChar() == '*' {
+			l.readChar()
+			literal := l.readMultiLineComment()
+			tok = newTokenLiteral(token.COMMENT, literal)
+		} else {
+			tok = newToken(token.SLASH, l.ch)
+		}
 
 	case '>':
 		if l.peekChar() == '=' {
@@ -131,13 +173,35 @@ func (l *Lexer) NextToken() token.Token {
 	return tok
 }
 
-func (l *Lexer) readIdentifier() string {
+func (l *Lexer) readSingleLineComment() string {
+	l.readChar() // delete extra /
 	pos := l.pos
-	for isLetter(l.ch) {
+	for l.ch != '\n' && l.ch != 0 {
 		l.readChar()
 	}
+
 	return l.source[pos:l.pos]
 }
+
+func (l *Lexer) readMultiLineComment() string {
+	l.readChar() //delete extra *
+	pos := l.pos
+	for {
+		if l.ch == 0 {
+
+			break
+		}
+		if l.ch == '*' && l.peekChar() == '/' {
+			l.readChar()
+			l.readChar()
+			break
+		}
+		l.readChar()
+	}
+
+	return l.source[pos : l.pos-2] // l pos -2 to not count */
+}
+
 func isLetter(b byte) bool {
 	if (b >= 'a' && b <= 'z') || (b >= 'A' && b <= 'Z') || b == '_' {
 		return true
@@ -148,25 +212,4 @@ func isLetter(b byte) bool {
 
 func isDigit(b byte) bool {
 	return (b >= '0' && b <= '9')
-}
-func (l *Lexer) readNumber() string {
-	pos := l.pos
-	for isDigit(l.ch) {
-		l.readChar()
-	}
-	return l.source[pos:l.pos]
-}
-func (l *Lexer) skipSpaces() {
-	for l.ch == '\n' || l.ch == '\t' || l.ch == ' ' {
-		l.readChar()
-
-	}
-
-}
-func (l *Lexer) peekChar() byte {
-	if l.readPos >= len(l.source) {
-		return 0
-	} else {
-		return l.source[l.readPos]
-	}
 }
