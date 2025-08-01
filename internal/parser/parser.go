@@ -1,7 +1,7 @@
 package parser
 
 import (
-	"C-Compiler/ast"
+	"C-Compiler/internal/ast"
 	"C-Compiler/internal/lexer"
 	"C-Compiler/internal/token"
 	"fmt"

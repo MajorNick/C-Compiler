@@ -106,7 +106,7 @@ func TestFunc(t *testing.T) {
 		{token.LPAREN, "("},
 		{token.RPAREN, ")"},
 		{token.LBRACE, "{"},
-		{token.COMMENT, "\n"},
+		{token.COMMENT, " Write C code here"},
 		{token.INTP, "int*"},
 		{token.IDENT, "a"},
 		{token.SEMICOLON, ";"},
