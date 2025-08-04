@@ -52,6 +52,8 @@ const (
 	SHORT = "SHORT"
 	INT   = "INT"
 	CHAR  = "CHAR"
+
+	NUMBER = "NUMBER"
 	//Pointers
 	LONGP  = "LONGP"
 	SHORTP = "SHORTP"

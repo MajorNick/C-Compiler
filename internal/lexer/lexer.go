@@ -160,7 +160,7 @@ func (l *Lexer) NextToken() token.Token {
 			return tok
 		} else {
 			if isDigit(l.ch) {
-				tok.Type = token.INT
+				tok.Type = token.NUMBER
 				tok.Literal = l.readNumber()
 				return tok
 			} else {
@@ -188,7 +188,6 @@ func (l *Lexer) readMultiLineComment() string {
 	pos := l.pos
 	for {
 		if l.ch == 0 {
-
 			break
 		}
 		if l.ch == '*' && l.peekChar() == '/' {
@@ -211,5 +210,5 @@ func isLetter(b byte) bool {
 }
 
 func isDigit(b byte) bool {
-	return (b >= '0' && b <= '9')
+	return b >= '0' && b <= '9'
 }

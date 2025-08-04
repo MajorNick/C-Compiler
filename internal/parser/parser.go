@@ -21,7 +21,7 @@ const (
 	CALL
 )
 
-var precendences = map[token.TokenType]int{
+var precedences = map[token.TokenType]int{
 	token.EQ:       EQUALS,
 	token.NOT_EQ:   EQUALS,
 	token.LEFT:     LESSGREATER,
@@ -34,15 +34,15 @@ var precendences = map[token.TokenType]int{
 	token.ASTERISK: PRODUCT,
 }
 
-func (p *Parser) nextPrecendence() int {
-	if prec, ok := precendences[p.nextTok.Type]; ok {
+func (p *Parser) nextPrecedence() int {
+	if prec, ok := precedences[p.nextTok.Type]; ok {
 		return prec
 	} else {
 		return LOWEST
 	}
 }
-func (p *Parser) curPrecendence() int {
-	if prec, ok := precendences[p.curTok.Type]; ok {
+func (p *Parser) curPrecedence() int {
+	if prec, ok := precedences[p.curTok.Type]; ok {
 		return prec
 	} else {
 		return LOWEST
@@ -72,7 +72,7 @@ func New(l *lexer.Lexer) *Parser {
 	p.errors = []string{}
 	// add parser fns
 	p.prefixParserFns = make(map[token.TokenType]prefixParserFn)
-	p.addPrefixFn(token.INT, p.parseIntegerLiteral)
+	p.addPrefixFn(token.NUMBER, p.parseNumberLiteral)
 	p.addPrefixFn(token.IDENT, p.parseIdentifier)
 	p.addPrefixFn(token.BANG, p.parsePrefixExpression)
 	p.addPrefixFn(token.MINUS, p.parsePrefixExpression)
@@ -141,7 +141,6 @@ func (p *Parser) parseStatement() ast.Statement {
 	case token.WHILE:
 
 	default:
-
 		return p.parseExpressionStatement()
 	}
 
@@ -245,7 +244,7 @@ func (p *Parser) parseExpression(precendence int) ast.Expression {
 		return nil
 	}
 	leftExpression := prefix()
-	for !p.nextTokenIs(token.SEMICOLON) && precendence < p.nextPrecendence() {
+	for !p.nextTokenIs(token.SEMICOLON) && precendence < p.nextPrecedence() {
 
 		infix := p.infixParserFns[p.nextTok.Type]
 		if infix == nil {
@@ -263,7 +262,7 @@ func (p *Parser) parseIdentifier() ast.Expression {
 	return &ast.Identifier{Token: p.curTok, Value: p.curTok.Literal}
 }
 
-func (p *Parser) parseIntegerLiteral() ast.Expression {
+func (p *Parser) parseNumberLiteral() ast.Expression {
 	lit := &ast.IntegerLiteral{Token: p.curTok}
 	value, err := strconv.ParseInt(p.curTok.Literal, 0, 64)
 
@@ -296,7 +295,7 @@ func (p *Parser) parseInfixExpression(left ast.Expression) ast.Expression {
 		Operator: p.curTok.Literal,
 		Left:     left,
 	}
-	precendence := p.nextPrecendence()
+	precendence := p.nextPrecedence()
 
 	p.nextToken()
 	expression.Right = p.parseExpression(precendence)
