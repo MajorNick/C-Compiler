@@ -21,69 +21,73 @@ var dataTypes = map[string]bool{
 	"long*":  true,
 }
 
-/*
-	func TestVarDecStatement(t *testing.T) {
-		input := `
+type decTest struct {
+	expectedType         string
+	expectedIdent        string
+	expectedValueLiteral string
+}
+
+func TestVarDecStatement(t *testing.T) {
+	input := `
 		int m = 0;
-		char c = 'a';
 		long l=10;
 		`
 
-		l := lexer.New(input)
-		p := New(l)
+	l := lexer.New(input)
+	p := New(l)
 
-		program := p.ParseProgram()
+	program := p.ParseProgram()
 
-		if program == nil {
-			t.Fatalf("nil after ParseProrgram")
-		}
-		if len(program.Stats) != 3 {
-			t.Fatalf("Wrong number of statements after ParseProgram")
-		}
+	if program == nil {
+		t.Fatalf("nil after ParseProrgram")
+	}
+	if len(program.Stats) != 2 {
+		t.Fatalf("Wrong number of statements after ParseProgram")
+	}
 
-		tests := []struct {
-			expectedType  string
-			expectedIdent string
-		}{
-			{"int", "m"},
-			{"char", "c"},
-			{"long", "l"},
-		}
+	tests := []decTest{
+		{"int", "m", "0"},
+		{"long", "l", "10"},
+	}
 
-		for i := range tests {
-			state := program.Stats[i]
-			if !wrapperTestDecStat(t, state, tests[i].expectedIdent, tests[i].expectedType) {
-				return
-			}
+	for i := range tests {
+		state := program.Stats[i]
+		if !wrapperTestDecStat(t, state, tests[i]) {
+			return
 		}
+	}
 
 }
 
-	func wrapperTestDecStat(t *testing.T, s ast.Statement, name string, tp string) bool {
-		if _, ok := dataTypes[s.TokenLiteral()]; !ok {
-			t.Errorf("Wrong  type: %v", s.TokenLiteral())
-		}
-
-		decState, ok := s.(*ast.DeclStatement)
-		if !ok {
-			t.Errorf("s Isn't Declare Statemen!")
-			return false
-		}
-		if s.TokenLiteral() != tp {
-			t.Errorf("Wrong Type: expected %s got : %s ", tp, s.TokenLiteral())
-			return false
-		}
-		if decState.Name.Value != name {
-			t.Errorf("decState.Name.Value not '%s'. got=%s", name, decState.Name.Value)
-			return false
-		}
-		if decState.Name.TokenLiteral() != name {
-			t.Errorf("decState.Name.TokenLiteral not '%s'. got=%s", name, decState.Name.TokenLiteral())
-			return false
-		}
-		return true
+func wrapperTestDecStat(t *testing.T, s ast.Statement, test decTest) bool {
+	if _, ok := dataTypes[s.TokenLiteral()]; !ok {
+		t.Errorf("Wrong  type: %v", s.TokenLiteral())
 	}
-*/
+
+	decState, ok := s.(*ast.DeclStatement).Statement.(*ast.VariableDecStatement)
+	if !ok {
+		t.Errorf("s Isn't variable Declare Statemen!")
+		return false
+	}
+	if decState.TokenLiteral() != test.expectedType {
+		t.Errorf("Wrong Type: expected %s got : %s ", test.expectedType, s.TokenLiteral())
+		return false
+	}
+	firstVar := decState.Vars[0]
+
+	if firstVar.Ident != test.expectedIdent {
+		t.Errorf("variable name  not  '%s'. got=%s", test.expectedIdent, firstVar.Ident)
+		return false
+	}
+
+	if firstVar.Value.String() != test.expectedValueLiteral {
+		t.Errorf("variable value not  '%s'. got=%s", test.expectedValueLiteral, firstVar.Value.String())
+		return false
+	}
+
+	return true
+}
+
 func TestParseReturn(t *testing.T) {
 	source := ` 
 	return 5;

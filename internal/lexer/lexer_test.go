@@ -50,6 +50,38 @@ func TestComments(t *testing.T) {
 		}
 	}
 }
+
+func TestIntDeclaration(t *testing.T) {
+	source := `
+  	int b = 10;
+   	long l=10;
+`
+
+	tests := []struct {
+		expected    token.TokenType
+		expectedLit string
+	}{
+
+		{token.INT, "int"},
+		{token.IDENT, "b"},
+		{token.ASSIGN, "="},
+		{token.NUMBER, "10"},
+		{token.SEMICOLON, ";"},
+		{token.LONG, "long"},
+		{token.IDENT, "l"},
+		{token.ASSIGN, "="},
+		{token.NUMBER, "10"},
+		{token.SEMICOLON, ";"},
+	}
+	l := New(source)
+	for i, v := range tests {
+		tok := l.NextToken()
+		if (tok.Type != v.expected) || (tok.Literal != v.expectedLit) {
+			t.Errorf("WRONG!!! expected: %v, got: %v, on %d th test", v, tok, i)
+		}
+	}
+}
+
 func TestHalfCode(t *testing.T) {
 
 	source := `    

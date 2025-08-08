@@ -139,7 +139,6 @@ func (p *Parser) parseStatement() ast.Statement {
 	case token.RETURN:
 		return p.parseReturnStatement()
 	case token.WHILE:
-
 	default:
 		return p.parseExpressionStatement()
 	}
@@ -178,7 +177,6 @@ func (p *Parser) parseDecStatement() *ast.DeclStatement {
 				p.nextToken()
 			}
 			p.nextToken()
-			fmt.Println(p.curTok)
 		}
 		p.nextToken()
 		fnStmt.Body = p.parseBlockSegment()
@@ -193,19 +191,20 @@ func (p *Parser) parseDecStatement() *ast.DeclStatement {
 
 				p.nextToken()
 				exp := p.parseExpressionStatement()
-				p.nextToken()
+
 				variable.Value = exp
 
-			} else {
-				p.nextToken()
 			}
 			varStmt.Vars = append(varStmt.Vars, variable)
-			if p.curTokenIs(token.COMMA) {
+			if p.nextTokenIs(token.SEMICOLON) {
+				p.nextToken()
+			}
+			if p.exceptNext(token.COMMA) {
 				p.nextToken()
 			}
 
 		}
-		p.nextToken()
+
 		stmt.Statement = varStmt
 	}
 
@@ -229,9 +228,7 @@ func (p *Parser) parseExpressionStatement() *ast.ExpressionStatement {
 
 	stmt.Expression = p.parseExpression(LOWEST)
 
-	if p.nextTokenIs(token.SEMICOLON) {
-		p.nextToken()
-	}
+	p.exceptNext(token.SEMICOLON)
 
 	return stmt
 }
