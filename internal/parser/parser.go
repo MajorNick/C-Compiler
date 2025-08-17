@@ -190,8 +190,8 @@ func (p *Parser) parseDecStatement() *ast.DeclStatement {
 			if p.exceptNext(token.ASSIGN) {
 
 				p.nextToken()
-				exp := p.parseExpressionStatement()
-
+				exp := p.parseExpression(LOWEST)
+				p.exceptNext(token.SEMICOLON)
 				variable.Value = exp
 
 			}
@@ -202,9 +202,7 @@ func (p *Parser) parseDecStatement() *ast.DeclStatement {
 			if p.exceptNext(token.COMMA) {
 				p.nextToken()
 			}
-
 		}
-
 		stmt.Statement = varStmt
 	}
 

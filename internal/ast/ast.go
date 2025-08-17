@@ -3,7 +3,7 @@ package ast
 import (
 	"C-Compiler/internal/token"
 	"bytes"
-	//"strings"
+	"strings"
 )
 
 type Node interface {
@@ -48,26 +48,40 @@ func (fl *FunctionLiteral) TokenLiteral() string {
 	return fl.Token.Literal
 }
 func (fl *FunctionLiteral) String() string {
-	/*
-		var out bytes.Buffer
-		args := []string{}
-		for _,v := range  fl.Arguments{
-			args = append(args, v.String())
-		}
-		out.WriteString(fl.TokenLiteral())
-		out.WriteString("(")
-		out.WriteString(strings.Join(args,", "))
-		out.WriteString(")")
+	var out bytes.Buffer
+	args := []string{}
+	for _, v := range fl.Arguments {
+		args = append(args, v.String())
+	}
+	out.WriteString(fl.TokenLiteral())
+	out.WriteString("(")
+	out.WriteString(strings.Join(args, ", "))
+	out.WriteString(")")
+	if fl.Body != nil {
+		out.WriteString(" ")
 		out.WriteString(fl.Body.String())
-	*/
-	return "tmp"
+	}
+	return out.String()
 }
 
 type Variable struct {
 	Type  token.Token
 	Ident string
-	Value Statement
+	Value Expression
 }
+
+func (v *Variable) String() string {
+	var out bytes.Buffer
+	out.WriteString(v.Type.Literal)
+	out.WriteString(" ")
+	out.WriteString(v.Ident)
+	if v.Value != nil {
+		out.WriteString(" = ")
+		out.WriteString(v.Value.String())
+	}
+	return out.String()
+}
+
 type DeclStatement struct {
 	Token     token.Token
 	Statement Statement
@@ -83,7 +97,14 @@ func (vds *VariableDecStatement) TokenLiteral() string {
 	return vds.Token.Literal
 }
 func (vds *VariableDecStatement) String() string {
-	return "test"
+	var out bytes.Buffer
+	vars := []string{}
+	for _, v := range vds.Vars {
+		vars = append(vars, v.String())
+	}
+	out.WriteString(strings.Join(vars, ", "))
+	out.WriteString(";")
+	return out.String()
 }
 
 // return
@@ -96,8 +117,15 @@ func (rs *ReturnStatement) statementNode() {}
 func (rs *ReturnStatement) TokenLiteral() string {
 	return rs.Token.Literal
 }
-func (id *ReturnStatement) String() string {
-	return "test"
+func (rs *ReturnStatement) String() string {
+	var out bytes.Buffer
+	out.WriteString(rs.TokenLiteral())
+	if rs.ReturnValue != nil {
+		out.WriteString(" ")
+		out.WriteString(rs.ReturnValue.String())
+	}
+	out.WriteString(";")
+	return out.String()
 }
 
 // Declare
@@ -108,8 +136,14 @@ func (dc *DeclStatement) TokenLiteral() string {
 // to satisfy interface
 func (dc *DeclStatement) statementNode() {
 }
-func (id *DeclStatement) String() string {
-	return "test"
+func (dc *DeclStatement) String() string {
+	var out bytes.Buffer
+	out.WriteString(dc.TokenLiteral())
+	if dc.Statement != nil {
+		out.WriteString(" ")
+		out.WriteString(dc.Statement.String())
+	}
+	return out.String()
 }
 
 // to satisfy interface
@@ -173,7 +207,14 @@ func (pe *PrefixExpression) TokenLiteral() string {
 	return pe.Token.Literal
 }
 func (pe *PrefixExpression) String() string {
-	return "test"
+	var out bytes.Buffer
+	out.WriteString("(")
+	out.WriteString(pe.Operator)
+	if pe.Right != nil {
+		out.WriteString(pe.Right.String())
+	}
+	out.WriteString(")")
+	return out.String()
 }
 
 type InfixExpression struct {
@@ -250,6 +291,8 @@ func (bs *BlockStatement) String() string {
 
 	for _, s := range bs.Statements {
 		out.WriteString(s.String())
+		out.WriteString(" ")
 	}
+
 	return out.String()
 }

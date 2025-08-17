@@ -56,7 +56,6 @@ func TestVarDecStatement(t *testing.T) {
 			return
 		}
 	}
-
 }
 
 func wrapperTestDecStat(t *testing.T, s ast.Statement, test decTest) bool {
