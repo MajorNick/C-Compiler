@@ -138,6 +138,8 @@ func (p *Parser) parseStatement() ast.Statement {
 		return p.parseDecStatement()
 	case token.RETURN:
 		return p.parseReturnStatement()
+	case token.IF:
+		return &ast.ExpressionStatement{Token: p.curTok, Expression: p.parseIf()}
 	case token.WHILE:
 	default:
 		return p.parseExpressionStatement()
@@ -150,8 +152,6 @@ func (p *Parser) parseDecStatement() *ast.DeclStatement {
 	TypeTok := p.curTok
 	stmt := &ast.DeclStatement{Token: TypeTok}
 	if !p.exceptNext(token.IDENT) {
-		err := fmt.Sprintf("Wrong Token. Expected: %s, got: %s", token.IDENT, p.curTok)
-		p.errors = append(p.errors, err)
 		return nil
 	}
 
@@ -187,11 +187,11 @@ func (p *Parser) parseDecStatement() *ast.DeclStatement {
 		for !p.curTokenIs(token.SEMICOLON) {
 			variable := &ast.Variable{Ident: p.curTok.Literal, Type: stmt.Token}
 
-			if p.exceptNext(token.ASSIGN) {
+			if p.nextTokenIs(token.ASSIGN) {
+				p.nextToken()
 
 				p.nextToken()
 				exp := p.parseExpression(LOWEST)
-				p.exceptNext(token.SEMICOLON)
 				variable.Value = exp
 
 			}
@@ -199,7 +199,8 @@ func (p *Parser) parseDecStatement() *ast.DeclStatement {
 			if p.nextTokenIs(token.SEMICOLON) {
 				p.nextToken()
 			}
-			if p.exceptNext(token.COMMA) {
+			if p.nextTokenIs(token.COMMA) {
+				p.nextToken()
 				p.nextToken()
 			}
 		}
@@ -342,16 +343,10 @@ func (p *Parser) parseBlockSegment() *ast.BlockStatement {
 
 // helper function
 
-func (p *Parser) variableDeclarationAssign() {
-
-}
-func (p *Parser) variableDeclaration() {
-
-}
-
 func (p *Parser) curTokenIs(t token.TokenType) bool {
 	return p.curTok.Type == t
 }
+
 func (p *Parser) nextTokenIs(t token.TokenType) bool {
 	return p.nextTok.Type == t
 }
@@ -361,6 +356,7 @@ func (p *Parser) exceptNext(t token.TokenType) bool {
 		p.nextToken()
 		return true
 	} else {
+		p.nextError(t) // Add error reporting here
 		return false
 	}
 }

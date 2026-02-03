@@ -175,8 +175,8 @@ func TestParsingPrefixExpressions(t *testing.T) {
 		operator string
 		IntValue int64
 	}{
-		{"!23", "!", 23},
-		{"-7", "-", 7},
+		{"!23;", "!", 23},
+		{"-7;", "-", 7},
 	}
 	for _, test := range Tests {
 		l := lexer.New(test.input)
@@ -241,12 +241,12 @@ func TestParseInfixExpressions(t *testing.T) {
 		operator string
 		right    int64
 	}{
-		{"2+2", 2, "+", 2},
-		{"2 * 2", 2, "*", 2},
-		{"2 /2", 2, "/", 2},
-		{"2 == 2", 2, "==", 2},
-		{"2 >= 2", 2, ">=", 2},
-		{"2 <= 2", 2, "<=", 2},
+		{"2+2;", 2, "+", 2},
+		{"2 * 2;", 2, "*", 2},
+		{"2 /2;", 2, "/", 2},
+		{"2 == 2;", 2, "==", 2},
+		{"2 >= 2;", 2, ">=", 2},
+		{"2 <= 2;", 2, "<=", 2},
 	}
 
 	for _, test := range Tests {
@@ -285,22 +285,22 @@ func TestOperatorPrecendence(t *testing.T) {
 		expected string
 	}{
 		{
-			"-a*b",
-			"((-a)*b)",
+			"-a*b;",
+			"((-a)*b)\n",
 		},
 		{
-			"!-a",
-			"!(-a)",
+			"!-a;",
+			"!(-a)\n",
 		}, {
-			"a+b/c",
-			"(a+(b/c))",
+			"a+b/c;",
+			"(a+(b/c))\n",
 		}, {
-			"a + b * c + d / e - f",
-			"(((a + (b * c)) + (d / e)) - f)",
+			"a + b * c + d / e - f;",
+			"(((a + (b * c)) + (d / e)) - f)\n",
 		}, {
 
-			"c+-a",
-			"(c+(-a))",
+			"c+-a;",
+			"(c+(-a))\n",
 		},
 	}
 
@@ -413,11 +413,11 @@ func TestOperatorPrecendenceParsing(t *testing.T) {
 			"false"},
 
 		{
-			"2>1 == false",
+			"2>1 == false;",
 			"(2 > (1 == false))",
 		},
 		{
-			"1 < 2 == true",
+			"1 < 2 == true;",
 			"(1 < (2 == true))",
 		},
 	}
@@ -430,8 +430,8 @@ func TestOperatorPrecendenceParsing(t *testing.T) {
 
 		checkParserError(t, p)
 
-		if program.String() != test.expected {
-			t.Errorf("wrong String. Expected: %s, Got: %s", test.expected, program.String())
+		if program.String() != test.expected+"\n" {
+			t.Errorf("wrong String. Expected: %q, Got: %q", test.expected+"\n", program.String())
 		}
 
 	}
