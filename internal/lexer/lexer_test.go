@@ -94,7 +94,8 @@ func TestHalfCode(t *testing.T) {
 		expected    token.TokenType
 		expectedLit string
 	}{
-		{token.INTP, "int*"},
+		{token.INT, "int"},
+		{token.ASTERISK, "*"},
 		{token.IDENT, "a"},
 		{token.SEMICOLON, ";"},
 		{token.INT, "int"},
@@ -139,7 +140,8 @@ func TestFunc(t *testing.T) {
 		{token.RPAREN, ")"},
 		{token.LBRACE, "{"},
 		{token.COMMENT, " Write C code here"},
-		{token.INTP, "int*"},
+		{token.INT, "int"},
+		{token.ASTERISK, "*"},
 		{token.IDENT, "a"},
 		{token.SEMICOLON, ";"},
 		{token.INT, "int"},

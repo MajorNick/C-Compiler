@@ -53,6 +53,7 @@ func (fl *FunctionLiteral) String() string {
 	args := []string{}
 	for _, v := range fl.Arguments {
 		args = append(args, v.String())
+
 	}
 	out.WriteString(fl.TokenLiteral())
 	out.WriteString("(")

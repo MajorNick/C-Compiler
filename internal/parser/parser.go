@@ -133,9 +133,15 @@ func (p *Parser) parseStatement() ast.Statement {
 
 	switch p.curTok.Type {
 	case token.INT, token.LONG, token.SHORT, token.CHAR:
-		return p.parseDecStatement()
+		if stmt := p.parseDecStatement(); stmt != nil {
+			return stmt
+		}
+		return nil
 	case token.INTP, token.LONGP, token.SHORTP, token.CHARP, token.VOIDP:
-		return p.parseDecStatement()
+		if stmt := p.parseDecStatement(); stmt != nil {
+			return stmt
+		}
+		return nil
 	case token.RETURN:
 		return p.parseReturnStatement()
 	case token.IF:
@@ -150,10 +156,19 @@ func (p *Parser) parseStatement() ast.Statement {
 
 func (p *Parser) parseDecStatement() *ast.DeclStatement {
 	TypeTok := p.curTok
+	if p.nextTokenIs(token.ASTERISK) {
+		p.nextToken()
+		if val, ok := token.LookForDataTypers(TypeTok.Type); ok {
+			TypeTok.Type = val
+			TypeTok.Literal += "*"
+		}
+	}
 	stmt := &ast.DeclStatement{Token: TypeTok}
-	if !p.exceptNext(token.IDENT) {
+	if !p.nextTokenIs(token.IDENT) && !p.nextTokenIs(token.MAIN) {
+		p.nextError(token.IDENT)
 		return nil
 	}
+	p.nextToken() // consume name
 
 	if p.nextTokenIs(token.LPAREN) {
 		//parse fn

@@ -31,6 +31,7 @@ func TestVarDecStatement(t *testing.T) {
 	input := `
 		int m = 0;
 		long l=10;
+		int * ptr = 5;
 		`
 
 	l := lexer.New(input)
@@ -41,13 +42,14 @@ func TestVarDecStatement(t *testing.T) {
 	if program == nil {
 		t.Fatalf("nil after ParseProrgram")
 	}
-	if len(program.Stats) != 2 {
+	if len(program.Stats) != 3 {
 		t.Fatalf("Wrong number of statements after ParseProgram")
 	}
 
 	tests := []decTest{
 		{"int", "m", "0"},
 		{"long", "l", "10"},
+		{"int*", "ptr", "5"},
 	}
 
 	for i := range tests {

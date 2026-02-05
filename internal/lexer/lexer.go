@@ -148,15 +148,15 @@ func (l *Lexer) NextToken() token.Token {
 
 			//check if data type is Pointer
 
-			if tok.Type != token.IDENT && l.ch == '*' {
+			// if tok.Type != token.IDENT && l.ch == '*' {
 
-				tmp, ok := token.LookForDataTypers(tok.Type)
-				if ok {
-					l.readChar()
-					tok.Type = tmp
-					tok.Literal += "*"
-				}
-			}
+			// 	tmp, ok := token.LookForDataTypers(tok.Type)
+			// 	if ok {
+			// 		l.readChar()
+			// 		tok.Type = tmp
+			// 		tok.Literal += "*"
+			// 	}
+			// }
 			return tok
 		} else {
 			if isDigit(l.ch) {
