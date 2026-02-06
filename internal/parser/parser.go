@@ -133,15 +133,9 @@ func (p *Parser) parseStatement() ast.Statement {
 
 	switch p.curTok.Type {
 	case token.INT, token.LONG, token.SHORT, token.CHAR:
-		if stmt := p.parseDecStatement(); stmt != nil {
-			return stmt
-		}
-		return nil
+		return p.parseDecStatement()
 	case token.INTP, token.LONGP, token.SHORTP, token.CHARP, token.VOIDP:
-		if stmt := p.parseDecStatement(); stmt != nil {
-			return stmt
-		}
-		return nil
+		return p.parseDecStatement()
 	case token.RETURN:
 		return p.parseReturnStatement()
 	case token.IF:
