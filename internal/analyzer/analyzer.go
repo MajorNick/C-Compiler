@@ -104,3 +104,7 @@ func (a *Analyzer) EvaluateReturnStatement(rs *ast.ReturnStatement) {
 		a.EvaluateStatement(rs.ReturnValue)
 	}
 }
+
+func (a *Analyzer) Errors() (bool, []string) {
+	return len(a.errors) > 0, a.errors
+}
